@@ -12,12 +12,17 @@ def main():
 
     for player_dict in response:
         player = Player(player_dict)
-        players.append(player)
+        if player.nationality == "FIN":
+            players.append((player, player.goals + player.assists))
+
+    def jarjestys(x):
+        return x[1]
+
+    players = sorted(players, key=jarjestys, reverse=True)
 
     print("Players from FIN:\n")
 
     for player in players:
-        if player.nationality == "FIN":
-            print(player)
+        print(f"{player[1]} points: {player[0]}")
 
 main()
