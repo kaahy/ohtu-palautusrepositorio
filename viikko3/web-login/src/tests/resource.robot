@@ -8,6 +8,7 @@ ${DELAY}  0 seconds
 ${HOME_URL}  http://${SERVER}
 ${LOGIN_URL}  http://${SERVER}/login
 ${REGISTER_URL}  http://${SERVER}/register
+${MAIN_URL}  http://${SERVER}/ohtu
 
 *** Keywords ***
 Open And Configure Browser
@@ -39,3 +40,6 @@ Go To Register Page
 
 Welcome Page Should Be Open
     Title Should Be  Welcome to Ohtu Application!
+
+Go To Main page
+    Go To  ${MAIN_URL}
