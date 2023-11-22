@@ -8,10 +8,10 @@ from tuote import Tuote
 class TestKauppa(unittest.TestCase):
     def setUp(self):
         self.pankki_mock = Mock()
-        viitegeneraattori_mock = Mock()
+        self.viitegeneraattori_mock = Mock()
 
         # palautetaan aina arvo 42
-        viitegeneraattori_mock.uusi.return_value = 42
+        self.viitegeneraattori_mock.uusi.return_value = 42
 
         varasto_mock = Mock()
 
@@ -38,8 +38,7 @@ class TestKauppa(unittest.TestCase):
         varasto_mock.hae_tuote.side_effect = varasto_hae_tuote
 
         # alustetaan kauppa
-        self.kauppa = Kauppa(varasto_mock, self.pankki_mock, viitegeneraattori_mock)
-
+        self.kauppa = Kauppa(varasto_mock, self.pankki_mock, self.viitegeneraattori_mock)
 
     def test_ostoksen_paaytyttya_pankin_metodia_tilisiirto_kutsutaan(self):
         # tehdään ostokset
@@ -77,3 +76,35 @@ class TestKauppa(unittest.TestCase):
         self.kauppa.lisaa_koriin(3)
         self.kauppa.tilimaksu("pekka", "12345")
         self.pankki_mock.tilisiirto.assert_called_with("pekka", ANY, "12345", ANY, 5)
+
+    def test_asioinnin_aloittaminen_nollaa_edellisten_ostosten_hinnan(self):
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.tilimaksu("pekka", "12345")
+
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.tilimaksu("pekka", "12345")
+
+        uusi_hinta = self.kauppa._ostoskori.hinta()
+
+        self.assertEqual(uusi_hinta, 5)
+
+    def test_kauppa_pyytaa_uuden_viitenumeron_jokaiselle_maksutapahtumalle(self):
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        
+        self.kauppa.tilimaksu("pekka", "12345")
+        self.assertEqual(self.viitegeneraattori_mock.uusi.call_count, 1)
+        
+        self.kauppa.tilimaksu("pekka", "12345")
+        self.assertEqual(self.viitegeneraattori_mock.uusi.call_count, 2)
+        
+        self.kauppa.tilimaksu("pekka", "12345")
+        self.assertEqual(self.viitegeneraattori_mock.uusi.call_count, 3)
+
+    def test_tuotteen_poistaminen_ostoskorista_vahentaa_sen_hinnan(self):
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.poista_korista(1)
+        self.assertEqual(self.kauppa._ostoskori.hinta(), 0)
