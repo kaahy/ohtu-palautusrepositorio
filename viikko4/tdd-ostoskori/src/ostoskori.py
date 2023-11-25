@@ -25,10 +25,9 @@ class Ostoskori:
     def lisaa_tuote(self, lisattava: Tuote):
         found = False
         for ostos in self._ostokset:
-            if lisattava.nimi == ostos.tuotteen_nimi:
-                ostos.lukumaara += 1
+            if lisattava.nimi() == ostos.tuotteen_nimi():
+                ostos.muuta_lukumaaraa(1)
                 found = True
-                break
 
         if not found:
             self._ostokset.append(Ostos(lisattava))
