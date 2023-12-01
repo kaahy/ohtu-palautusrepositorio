@@ -7,7 +7,9 @@ class Summa:
         self.lue_syote = lue_syote
 
     def suorita(self):
-        self.io.plus(int(self.lue_syote()))
+        luku = int(self.lue_syote())
+        muisti.paivita(luku)
+        self.io.plus(luku)
 
 class Erotus:
     def __init__(self, sovelluslogiikka, lue_syote):
@@ -15,7 +17,9 @@ class Erotus:
         self.lue_syote = lue_syote
 
     def suorita(self):
-        self.io.miinus(int(self.lue_syote()))
+        luku = int(self.lue_syote())
+        muisti.paivita(-luku)
+        self.io.miinus(luku)
 
 class Nollaus:
     def __init__(self, sovelluslogiikka, lue_syote):
@@ -24,6 +28,31 @@ class Nollaus:
 
     def suorita(self):
         self.io.nollaa()
+
+class Kumoa:
+    def __init__(self, sovelluslogiikka, lue_syote):
+        self.io = sovelluslogiikka
+        self.lue_syote = lue_syote
+
+    def suorita(self):
+        arvo = self.io.arvo()
+        lisattava = muisti.hae_muistista() * -1
+        self.io.aseta_arvo(arvo + lisattava)
+
+class Muisti:
+    def __init__(self):
+        self._muutos = 0
+
+    def paivita(self, muutos=0):
+        self._muutos = muutos
+
+    def nollaa_muisti(self):
+        self._muutos = 0
+
+    def hae_muistista(self):
+        muutos = self._muutos
+        self.nollaa_muisti()
+        return muutos
 
 class Komento(Enum):
     SUMMA = 1
@@ -39,10 +68,13 @@ class Kayttoliittyma:
         self._komennot = {
             Komento.SUMMA: Summa(sovelluslogiikka, self._lue_syote),
             Komento.EROTUS: Erotus(sovelluslogiikka, self._lue_syote),
-            Komento.NOLLAUS: Nollaus(sovelluslogiikka, self._lue_syote)
+            Komento.NOLLAUS: Nollaus(sovelluslogiikka, self._lue_syote),
+            Komento.KUMOA: Kumoa(sovelluslogiikka, self._lue_syote)
         }
 
     def kaynnista(self):
+        global muisti
+        muisti = Muisti()
         self._arvo_var = StringVar()
         self._arvo_var.set(self._sovelluslogiikka.arvo())
         self._syote_kentta = ttk.Entry(master=self._root)
