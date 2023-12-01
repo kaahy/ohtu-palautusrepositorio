@@ -41,18 +41,20 @@ class Kumoa:
 
 class Muisti:
     def __init__(self):
-        self._muutos = 0
+        self._muutokset = [0]
 
     def paivita(self, muutos=0):
-        self._muutos = muutos
+        self._muutokset.append(muutos)
 
-    def nollaa_muisti(self):
-        self._muutos = 0
+    def _poista_viimeinen(self):
+        self._muutokset.pop()
+        if len(self._muutokset) == 0:
+            self._muutokset = [0]
 
     def hae_muistista(self):
-        muutos = self._muutos
-        self.nollaa_muisti()
-        return muutos
+        uusin_muutos = self._muutokset[-1]
+        self._poista_viimeinen()
+        return uusin_muutos
 
 class Komento(Enum):
     SUMMA = 1
