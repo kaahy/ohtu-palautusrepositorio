@@ -70,3 +70,25 @@ class Or:
                 return True
 
         return False
+
+# tehtävä 4:
+
+class QueryBuilder:
+    def __init__(self, pino = All(), kaskyhistoria=[All()]):
+        self.pino_olio = pino
+        self.kaskyhistoria = kaskyhistoria # esim. [PlaysIn("SEA"), HasAtLeast(3, "goals")]
+
+    def build(self):
+        return self.pino_olio
+
+    def playsIn(self, team):
+        self.kaskyhistoria.append(PlaysIn(team))
+        return QueryBuilder(And(*self.kaskyhistoria))
+    
+    def hasAtLeast(self, value, attr):
+        self.kaskyhistoria.append(HasAtLeast(value, attr))
+        return QueryBuilder(And(*self.kaskyhistoria))
+    
+    def hasFewerThan(self, value, attr):
+        self.kaskyhistoria.append(HasFewerThan(value, attr))
+        return QueryBuilder(And(*self.kaskyhistoria))
